@@ -212,6 +212,40 @@ router.get('/history', authenticateToken, async (req, res) => {
     }
 });
 
+// Route pour obtenir le statut de la géolocalisation (publique)
+router.get('/geo-status', async (req, res) => {
+    try {
+        const LOCATION_FILE = path.join(__dirname, '../data/location.json');
+
+        let locationConfig;
+        try {
+            const data = await fs.readFile(LOCATION_FILE, 'utf8');
+            locationConfig = JSON.parse(data);
+        } catch (error) {
+            // Configuration par défaut si le fichier n'existe pas
+            locationConfig = {
+                enabled: false,
+                center: { latitude: 0, longitude: 0 },
+                radius: 100,
+                description: 'Géolocalisation désactivée'
+            };
+        }
+
+        res.json({
+            enabled: locationConfig.enabled,
+            center: locationConfig.center,
+            radius: locationConfig.radius
+        });
+
+    } catch (error) {
+        console.error('Erreur récupération statut geo:', error);
+        res.status(500).json({ 
+            enabled: false,
+            message: 'Erreur serveur interne'
+        });
+    }
+});
+
 // Route pour vérifier la position
 router.post('/check-location', authenticateToken, async (req, res) => {
     try {
