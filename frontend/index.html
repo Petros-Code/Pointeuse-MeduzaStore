@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pointeuse - Pointage du temps de travail</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <img src="/images/logo_meduza.png" alt="Logo" class="logo">
+                <div class="header-text">
+                    <h1>Pointeuse</h1>
+                    <p>Pointage du temps de travail</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Section de connexion -->
+        <div id="loginSection" class="section">
+            <h2>Connexion</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Nom d'utilisateur :</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Mot de passe :</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit">Se connecter</button>
+            </form>
+            <p id="loginError" class="error"></p>
+        </div>
+
+        <!-- Section de pointage -->
+        <div id="pointageSection" class="section" style="display: none;">
+            <h2>Bonjour <span id="userName"></span> !</h2>
+            
+            <div class="status">
+                <p>Statut actuel : <span id="currentStatus">Non connecté</span></p>
+                <p>Dernière action : <span id="lastAction">-</span></p>
+            </div>
+
+            <div class="buttons">
+                <button id="startDay" class="btn btn-start">🌅 Début de journée</button>
+                <button id="startBreak" class="btn btn-break">☕ Début de pause</button>
+                <button id="endBreak" class="btn btn-break">☕ Fin de pause</button>
+                <button id="endDay" class="btn btn-end">🌙 Fin de journée</button>
+            </div>
+
+            <div class="logout">
+                <button id="logoutBtn" class="btn btn-logout">Se déconnecter</button>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        <div id="message" class="message"></div>
+        
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Cette application a été développée pour <b>Meduza Store</b> par <b>Petros-Code</b></p>
+        </footer>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration - Pointeuse</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .admin-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .admin-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .btn-test {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 16px;
+        }
+        .btn-test:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+        .result.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .result.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+        .back-link:hover {
+            color: #5a67d8;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <a href="/" class="back-link">← Retour à la pointeuse</a>
+        
+        <header>
+            <h1>🔧 Administration</h1>
+            <p>Gestion du système de pointage</p>
+        </header>
+
+        <!-- Section de connexion -->
+        <div id="loginSection" class="admin-section">
+            <h2>Connexion Administrateur</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Nom d'utilisateur :</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Mot de passe :</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit">Se connecter</button>
+            </form>
+            <p id="loginError" class="error"></p>
+        </div>
+
+        <!-- Section d'administration -->
+        <div id="adminSection" class="admin-section" style="display: none;">
+            <h2>Bonjour <span id="adminName"></span> !</h2>
+            
+            <!-- Section Gestion des utilisateurs -->
+            <div class="admin-section">
+                <h3>👥 Gestion des utilisateurs</h3>
+                <p>Créer un nouveau compte salarié.</p>
+                
+                <form id="createUserForm">
+                    <div class="form-group">
+                        <label for="newUsername">Nom d'utilisateur :</label>
+                        <input type="text" id="newUsername" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword">Mot de passe :</label>
+                        <input type="password" id="newPassword" name="password" required>
+                    </div>
+                    <button type="submit" class="btn-test">➕ Créer le compte</button>
+                </form>
+                
+                <div id="userResult" class="result"></div>
+            </div>
+
+            <!-- Section Géolocalisation -->
+            <div class="admin-section">
+                <h3>🌍 Géolocalisation</h3>
+                <p>Contrôler la géolocalisation pour le pointage.</p>
+                
+                <!-- Switch pour activer/désactiver -->
+                <div class="switch-container">
+                    <label class="switch">
+                        <input type="checkbox" id="geoEnabled">
+                        <span class="slider"></span>
+                    </label>
+                    <span class="switch-label">Géolocalisation activée</span>
+                </div>
+                
+                <button id="configureGeoBtn" class="btn-test">⚙️ Configurer la zone</button>
+                
+                <div id="geoResult" class="result"></div>
+            </div>
+
+            <!-- Section Configuration de la zone (modale) -->
+            <div id="geoConfigModal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>⚙️ Configuration de la zone de travail</h3>
+                        <span class="close" id="closeGeoModal">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="geoLatitude">Latitude du centre :</label>
+                            <input type="number" id="geoLatitude" step="0.000001" placeholder="48.8566">
+                        </div>
+                        <div class="form-group">
+                            <label for="geoLongitude">Longitude du centre :</label>
+                            <input type="number" id="geoLongitude" step="0.000001" placeholder="2.3522">
+                        </div>
+                        <div class="form-group">
+                            <label for="geoRadius">Rayon autorisé (mètres) :</label>
+                            <input type="number" id="geoRadius" min="10" max="1000" placeholder="100">
+                        </div>
+                        <button id="getCurrentLocationBtn" class="btn-test">📍 Utiliser ma position actuelle</button>
+                        <button id="saveGeoConfigBtn" class="btn-test">💾 Sauvegarder la configuration</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Email -->
+            <div class="admin-section">
+                <h3>📧 Test du système d'emails</h3>
+                <p>Testez l'envoi d'emails pour vérifier la configuration.</p>
+                
+                <button id="testEmailBtn" class="btn-test">🧪 Envoyer un email de test</button>
+                <button id="dailySummaryBtn" class="btn-test">📊 Envoyer le résumé quotidien</button>
+                <button id="monthlySummaryBtn" class="btn-test">📅 Envoyer le résumé mensuel</button>
+                
+                <div id="emailResult" class="result"></div>
+            </div>
+
+
+            <div class="logout">
+                <button id="logoutBtn" class="btn btn-logout">Se déconnecter</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/admin.js"></script>
+</body>
+</html>

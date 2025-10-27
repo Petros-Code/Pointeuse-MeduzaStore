@@ -1,0 +1,15 @@
+# =============================
+# Passenger Node.js
+# =============================
+PassengerAppRoot /home/qtly6045/Pointeuse/backend
+PassengerAppType node
+PassengerStartupFile server.js
+PassengerNodejs /opt/alt/alt-nodejs20/root/usr/bin/node
+PassengerFriendlyErrorPages off
+PassengerRestartDir /home/qtly6045/Pointeuse/backend/tmp
+
+# Redirige tout vers Node.js
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ /backend/$1 [L]
