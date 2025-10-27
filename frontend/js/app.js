@@ -85,25 +85,39 @@ class PointeuseApp {
     async pointage(action) {
         if (!this.currentUser) return;
 
-        // Afficher le spinner de chargement
-        this.showLoadingSpinner();
-
-        // Vérifier la géolocalisation avant le pointage
+        // Vérifier d'abord si la géolocalisation est activée
+        let geoStatus;
         try {
-            const position = await this.getCurrentPosition();
-            const isInZone = await this.checkLocationInZone(position);
+            geoStatus = await this.getGeoStatus();
             
-            if (!isInZone) {
-                this.hideLoadingSpinner();
-                this.showMessage('❌ Vous devez être sur le lieu de travail pour pointer !', 'error');
-                return;
+            // Si la géolocalisation est activée, vérifier la position
+            if (geoStatus.enabled) {
+                // Afficher le spinner avec message de vérification
+                this.showLoadingSpinner('🔄 Vérification de votre position...');
+                try {
+                    const position = await this.getCurrentPosition();
+                    const isInZone = await this.checkLocationInZone(position);
+                    
+                    if (!isInZone) {
+                        this.hideLoadingSpinner();
+                        this.showMessage('❌ Vous devez être sur le lieu de travail pour pointer !', 'error');
+                        return;
+                    }
+                } catch (error) {
+                    console.error('Erreur géolocalisation:', error);
+                    this.hideLoadingSpinner();
+                    this.showMessage('❌ Impossible de vérifier votre position. Pointage bloqué.', 'error');
+                    return;
+                }
             }
         } catch (error) {
-            console.error('Erreur géolocalisation:', error);
-            this.hideLoadingSpinner();
-            this.showMessage('❌ Impossible de vérifier votre position. Pointage bloqué.', 'error');
+            console.error('Erreur vérification statut géo:', error);
+            this.showMessage('❌ Impossible de vérifier la configuration de géolocalisation.', 'error');
             return;
         }
+
+        // Afficher le spinner pour le pointage
+        this.showLoadingSpinner('🔄 Pointage en cours...');
 
         try {
             const response = await fetch('/api/pointage', {
@@ -205,7 +219,7 @@ class PointeuseApp {
     }
 
     // Afficher le spinner de chargement
-    showLoadingSpinner() {
+    showLoadingSpinner(message = '🔄 Traitement en cours...') {
         // Désactiver tous les boutons de pointage
         const buttons = ['startDay', 'startBreak', 'endBreak', 'endDay'];
         buttons.forEach(buttonId => {
@@ -217,7 +231,7 @@ class PointeuseApp {
         });
 
         // Afficher le message de chargement
-        this.showMessage('🔄 Vérification de votre position...', 'info');
+        this.showMessage(message, 'info');
     }
 
     // Masquer le spinner de chargement
@@ -259,6 +273,22 @@ class PointeuseApp {
                 }
             );
         });
+    }
+
+    async getGeoStatus() {
+        try {
+            const response = await fetch('/api/pointage/geo-status');
+            
+            if (response.ok) {
+                const data = await response.json();
+                return data;
+            } else {
+                throw new Error('Erreur de récupération du statut');
+            }
+        } catch (error) {
+            console.error('Erreur récupération statut géo:', error);
+            throw error;
+        }
     }
 
     async checkLocationInZone(position) {
