@@ -42,7 +42,7 @@ router.post('/login', async (req, res) => {
 
         const token = generateToken(user);
         const userInfo = {
-            id: user.id,
+            userId: user.id,
             username: user.username,
             role: user.role
         };
@@ -73,7 +73,7 @@ router.get('/verify', async (req, res) => {
         }
 
         return successResponse(res, 'Token valide', {
-            id: user.id,
+            userId: user.id,
             username: user.username,
             role: user.role
         });
@@ -119,7 +119,7 @@ router.post('/register', async (req, res) => {
         res.json({
             message: 'Utilisateur créé avec succès',
             user: {
-                id: newUser.id,
+                userId: newUser.id,
                 username: newUser.username,
                 role: newUser.role
             }
