@@ -85,6 +85,9 @@ class PointeuseApp {
     async pointage(action) {
         if (!this.currentUser) return;
 
+        console.log('🎯 Début du pointage pour action:', action);
+        console.log('👤 Utilisateur actuel:', this.currentUser);
+
         // Vérifier d'abord si la géolocalisation est activée
         let geoStatus = { enabled: false }; // Valeur par défaut
         try {
@@ -121,6 +124,8 @@ class PointeuseApp {
 
         try {
             const token = localStorage.getItem('token');
+            console.log('🔑 Token récupéré:', token ? 'Présent' : 'Absent');
+            
             if (!token) {
                 this.hideLoadingSpinner();
                 this.showMessage('❌ Session expirée. Veuillez vous reconnecter.', 'error');
@@ -128,6 +133,7 @@ class PointeuseApp {
                 return;
             }
 
+            console.log('📤 Envoi de la requête de pointage...');
             const response = await fetch('/api/pointage', {
                 method: 'POST',
                 headers: {
@@ -137,7 +143,9 @@ class PointeuseApp {
                 body: JSON.stringify({ action })
             });
 
+            console.log('📡 Réponse reçue:', response.status, response.statusText);
             const data = await response.json();
+            console.log('📄 Données de réponse:', data);
 
             if (response.ok) {
                 this.hideLoadingSpinner();
@@ -146,6 +154,7 @@ class PointeuseApp {
             } else {
                 this.hideLoadingSpinner();
                 if (response.status === 401 || response.status === 403) {
+                    console.log('❌ Token invalide, déconnexion...');
                     this.showMessage('❌ Session expirée. Veuillez vous reconnecter.', 'error');
                     this.logout();
                 } else {
@@ -153,7 +162,7 @@ class PointeuseApp {
                 }
             }
         } catch (error) {
-            console.error('Erreur de pointage:', error);
+            console.error('❌ Erreur de pointage:', error);
             this.hideLoadingSpinner();
             this.showMessage('Erreur de connexion au serveur', 'error');
         }
@@ -290,16 +299,20 @@ class PointeuseApp {
 
     async getGeoStatus() {
         try {
+            console.log('🔍 Vérification du statut de géolocalisation...');
             const response = await fetch('/api/pointage/geo-status');
+            
+            console.log('📡 Réponse geo-status:', response.status, response.statusText);
             
             if (response.ok) {
                 const data = await response.json();
+                console.log('✅ Statut géolocalisation:', data);
                 return data;
             } else {
                 throw new Error('Erreur de récupération du statut');
             }
         } catch (error) {
-            console.error('Erreur récupération statut géo:', error);
+            console.error('❌ Erreur récupération statut géo:', error);
             throw error;
         }
     }

@@ -5,5 +5,12 @@
     "password": "$2a$10$vVgXXxwfQTnlzPfF2xWKSu3tfjDOOM.HGa4hYSD0lMOALDXaFo/Iu",
     "role": "admin",
     "createdAt": "2025-10-22T13:20:40.857Z"
+  },
+  {
+    "id": "1761558693874",
+    "username": "Pierre",
+    "password": "$2a$10$q096AqXz6G52gppoGskNhuuqILnxkGHg1xt0zwmNMf.4TlD.0vpZi",
+    "role": "employee",
+    "createdAt": "2025-10-27T09:51:33.942Z"
   }
 ]

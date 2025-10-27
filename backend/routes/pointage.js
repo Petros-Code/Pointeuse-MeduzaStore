@@ -2,31 +2,13 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const fs = require('fs').promises;
 const path = require('path');
+const { JWT_SECRET } = require('../utils/constants.js');
+const { authenticateToken } = require('../utils/authUtils.js');
 
 // __filename et __dirname sont automatiquement disponibles en CommonJS
 
 const router = express.Router();
-
-const JWT_SECRET = 'votre_cle_secrete_super_securisee';
 const POINTAGE_FILE = path.join(__dirname, '../data/pointage.json');
-
-// Middleware d'authentification
-function authenticateToken(req, res, next) {
-    const authHeader = req.headers.authorization;
-    const token = authHeader && authHeader.split(' ')[1];
-
-    if (!token) {
-        return res.status(401).json({ message: 'Token d\'accès requis' });
-    }
-
-    jwt.verify(token, JWT_SECRET, (err, user) => {
-        if (err) {
-            return res.status(403).json({ message: 'Token invalide' });
-        }
-        req.user = user;
-        next();
-    });
-}
 
 // Initialiser le fichier de pointage
 async function initPointageFile() {
@@ -105,9 +87,14 @@ async function getUserStatus(userId) {
 // Route pour enregistrer un pointage
 router.post('/', authenticateToken, async (req, res) => {
     try {
+        console.log('🔍 Requête de pointage reçue:', req.body);
+        console.log('👤 Utilisateur authentifié:', req.user);
+        
         const { action } = req.body;
         const userId = req.user.userId;
         const username = req.user.username;
+
+        console.log('📝 Action:', action, 'UserID:', userId, 'Username:', username);
 
         if (!action) {
             return res.status(400).json({ message: 'Action requise' });
@@ -215,13 +202,16 @@ router.get('/history', authenticateToken, async (req, res) => {
 // Route pour obtenir le statut de la géolocalisation (publique)
 router.get('/geo-status', async (req, res) => {
     try {
+        console.log('🔍 Requête geo-status reçue');
         const LOCATION_FILE = path.join(__dirname, '../data/location.json');
 
         let locationConfig;
         try {
             const data = await fs.readFile(LOCATION_FILE, 'utf8');
             locationConfig = JSON.parse(data);
+            console.log('📄 Configuration géolocalisation lue:', locationConfig);
         } catch (error) {
+            console.log('⚠️ Fichier location.json non trouvé, utilisation de la config par défaut');
             // Configuration par défaut si le fichier n'existe pas
             locationConfig = {
                 enabled: false,
@@ -231,14 +221,17 @@ router.get('/geo-status', async (req, res) => {
             };
         }
 
-        res.json({
+        const response = {
             enabled: locationConfig.enabled,
             center: locationConfig.center,
             radius: locationConfig.radius
-        });
+        };
+        
+        console.log('✅ Réponse geo-status:', response);
+        res.json(response);
 
     } catch (error) {
-        console.error('Erreur récupération statut geo:', error);
+        console.error('❌ Erreur récupération statut geo:', error);
         res.status(500).json({ 
             enabled: false,
             message: 'Erreur serveur interne'

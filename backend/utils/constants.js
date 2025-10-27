@@ -4,7 +4,7 @@ const dotenv = require('dotenv');
 // Charger les variables d'environnement
 dotenv.config();
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET || 'votre_cle_secrete_super_securisee';
 const TOKEN_EXPIRY = '24h';
 
 // Configuration serveur

@@ -1,1 +1,66 @@
-[]
+[
+  {
+    "id": "1761559096398",
+    "userId": "meduzadmin82",
+    "username": "Meduzadmin82/",
+    "action": "start_day",
+    "timestamp": "2025-10-27T09:58:16.398Z",
+    "date": "2025-10-27"
+  },
+  {
+    "id": "1761560167858",
+    "userId": "meduzadmin82",
+    "username": "Meduzadmin82/",
+    "action": "start_break",
+    "timestamp": "2025-10-27T10:16:07.858Z",
+    "date": "2025-10-27"
+  },
+  {
+    "id": "1761560706212",
+    "userId": "meduzadmin82",
+    "username": "Meduzadmin82/",
+    "action": "end_break",
+    "timestamp": "2025-10-27T10:25:06.212Z",
+    "date": "2025-10-27"
+  },
+  {
+    "id": "1761560826949",
+    "userId": "meduzadmin82",
+    "username": "Meduzadmin82/",
+    "action": "end_day",
+    "timestamp": "2025-10-27T10:27:06.949Z",
+    "date": "2025-10-27"
+  },
+  {
+    "id": "1761560896085",
+    "userId": "1761558693874",
+    "username": "Pierre",
+    "action": "start_day",
+    "timestamp": "2025-10-27T10:28:16.085Z",
+    "date": "2025-10-27"
+  },
+  {
+    "id": "1761560902296",
+    "userId": "1761558693874",
+    "username": "Pierre",
+    "action": "start_break",
+    "timestamp": "2025-10-27T10:28:22.296Z",
+    "date": "2025-10-27"
+  },
+  {
+    "id": "1761560906483",
+    "userId": "1761558693874",
+    "username": "Pierre",
+    "action": "end_break",
+    "timestamp": "2025-10-27T10:28:26.483Z",
+    "date": "2025-10-27"
+  },
+  {
+    "id": "1761560910412",
+    "userId": "1761558693874",
+    "username": "Pierre",
+    "action": "end_day",
+    "timestamp": "2025-10-27T10:28:30.412Z",
+    "date": "2025-10-27"
+  }
+]
