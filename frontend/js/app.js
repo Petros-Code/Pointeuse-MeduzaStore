@@ -86,45 +86,53 @@ class PointeuseApp {
         if (!this.currentUser) return;
 
         // Vérifier d'abord si la géolocalisation est activée
-        let geoStatus;
+        let geoStatus = { enabled: false }; // Valeur par défaut
         try {
             geoStatus = await this.getGeoStatus();
-            
-            // Si la géolocalisation est activée, vérifier la position
-            if (geoStatus.enabled) {
-                // Afficher le spinner avec message de vérification
-                this.showLoadingSpinner('🔄 Vérification de votre position...');
-                try {
-                    const position = await this.getCurrentPosition();
-                    const isInZone = await this.checkLocationInZone(position);
-                    
-                    if (!isInZone) {
-                        this.hideLoadingSpinner();
-                        this.showMessage('❌ Vous devez être sur le lieu de travail pour pointer !', 'error');
-                        return;
-                    }
-                } catch (error) {
-                    console.error('Erreur géolocalisation:', error);
+        } catch (error) {
+            console.warn('Impossible de vérifier le statut de géolocalisation, utilisation de la valeur par défaut:', error);
+            // En cas d'erreur, on considère que la géolocalisation est désactivée
+            geoStatus = { enabled: false };
+        }
+        
+        // Si la géolocalisation est activée, vérifier la position
+        if (geoStatus.enabled) {
+            // Afficher le spinner avec message de vérification
+            this.showLoadingSpinner('🔄 Vérification de votre position...');
+            try {
+                const position = await this.getCurrentPosition();
+                const isInZone = await this.checkLocationInZone(position);
+                
+                if (!isInZone) {
                     this.hideLoadingSpinner();
-                    this.showMessage('❌ Impossible de vérifier votre position. Pointage bloqué.', 'error');
+                    this.showMessage('❌ Vous devez être sur le lieu de travail pour pointer !', 'error');
                     return;
                 }
+            } catch (error) {
+                console.error('Erreur géolocalisation:', error);
+                this.hideLoadingSpinner();
+                this.showMessage('❌ Impossible de vérifier votre position. Pointage bloqué.', 'error');
+                return;
             }
-        } catch (error) {
-            console.error('Erreur vérification statut géo:', error);
-            this.showMessage('❌ Impossible de vérifier la configuration de géolocalisation.', 'error');
-            return;
         }
 
         // Afficher le spinner pour le pointage
         this.showLoadingSpinner('🔄 Pointage en cours...');
 
         try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                this.hideLoadingSpinner();
+                this.showMessage('❌ Session expirée. Veuillez vous reconnecter.', 'error');
+                this.logout();
+                return;
+            }
+
             const response = await fetch('/api/pointage', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({ action })
             });
@@ -137,7 +145,12 @@ class PointeuseApp {
                 this.updateStatus();
             } else {
                 this.hideLoadingSpinner();
-                this.showMessage(data.message || 'Erreur de pointage', 'error');
+                if (response.status === 401 || response.status === 403) {
+                    this.showMessage('❌ Session expirée. Veuillez vous reconnecter.', 'error');
+                    this.logout();
+                } else {
+                    this.showMessage(data.message || 'Erreur de pointage', 'error');
+                }
             }
         } catch (error) {
             console.error('Erreur de pointage:', error);
@@ -293,17 +306,26 @@ class PointeuseApp {
 
     async checkLocationInZone(position) {
         try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                throw new Error('Token manquant');
+            }
+
             const response = await fetch('/api/pointage/check-location', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
                     latitude: position.latitude,
                     longitude: position.longitude
                 })
             });
+
+            if (response.status === 401 || response.status === 403) {
+                throw new Error('Token invalide ou expiré');
+            }
 
             const data = await response.json();
             return data.inZone;
